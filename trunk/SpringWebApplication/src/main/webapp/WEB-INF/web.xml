@@ -7,7 +7,110 @@
   <display-name>Spring J2ee Application</display-name>
   
   <welcome-file-list>
-    <welcome-file>index.jsp</welcome-file>
+  	<welcome-file>index.jsp</welcome-file>
   </welcome-file-list>
+  
+  <!--Main Spring Framework Configuration File (Spring conf, Spring Java bean definitions)-->
+  <context-param>
+  	<param-name>contextConfigLocation</param-name>
+  	<param-value>/WEB-INF/applicationContext.xml</param-value>
+  </context-param>
+  
+  <!-- Holds views / Change the default suffix for JSP views. Allow the web application to define an alternate suffix for JSP pages containingJSF content. -->
+  <context-param>
+  	<param-name>javax.faces.DEFAULT_SUFFIX</param-name>
+  	<param-value>.xhtml</param-value>
+  </context-param>
+  
+  <!-- print debug info for errors (Context parameter in web.xml). Set it to false to remove extra overhead at production environment -->
+  <context-param>
+  	<param-name>facelets.DEVELOPMENT</param-name>
+  	<param-value>true</param-value>
+  </context-param>
+  
+  <!-- Make servlet refresh/interval compiler checks for page changes – lower values useful during development – set to -1 if you don't want checks made.-->
+  <context-param>
+  	<param-name>javax.faces.FACELETS_REFRESH_PERIOD</param-name>
+  	<param-value>1</param-value>
+  </context-param>
+  
+  <!-- Spring listener class responsible for context loading, Bootstrap listener to start up Spring's root WebApplicationContext-->
+  <!-- The context-param is used by the ContextLoaderListener to create an ApplicationContext for you middle tier beans in a web application.  -->
+  <listener>
+  	<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+  
+  <!-- Special resource servlet for efficiently resolving and rendering static resources from within a JAR file.-->
+  <servlet>
+  	<servlet-name>Resources Servlet</servlet-name>
+  	<servlet-class>org.springframework.js.resource.ResourceServlet</servlet-class>
+  	<load-on-startup>0</load-on-startup>
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>Resources Servlet</servlet-name>
+  	<url-pattern>/resources/*</url-pattern>
+  </servlet-mapping>
+  
+  <!-- Entry point to spring webflow Clever servlet implementation by spring that handlets all request/response by app and resolve by correct modules-->
+  <!-- Dispatches to registered handlers for processing a web request, providing convenient mapping and exception handling facilities -->
+  <servlet>
+  	<servlet-name>Spring MVC Dispatcher Servlet</servlet-name>
+  	<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+  	<init-param>
+  		<param-name>contextConfigLocation</param-name>
+  		<param-value></param-value>  <!-- Empty param pints to root folder-->
+  	</init-param>
+  	<load-on-startup>1</load-on-startup>
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>Spring MVC Dispatcher Servlet</servlet-name>
+  	<url-pattern>/app/*</url-pattern> <!-- /* => All the flow with pass through the dispatcher-->
+  </servlet-mapping>
+  
+  <!-- FacesServlet is a servlet that manages the request processing lifecycle for web applications that are utilizing JavaServer Faces to construct the user interface. -->
+  <servlet>
+  	<servlet-name>Faces Servlet</servlet-name>
+  	<servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+  	<load-on-startup>1</load-on-startup>
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>Faces Servlet</servlet-name>
+  	<url-pattern>*.jsf</url-pattern>
+  </servlet-mapping>
+  
+  <!-- This is useful because current browsers typically do not set a character encoding even if specified in the HTML page or form.-->
+  <!-- This filter can either apply its encoding if the request does not already specify an encoding, or enforce this filter's encoding in any case ("forceEncoding"="true"). --> 
+  <filter>
+  	<filter-name>charEncodingFilter</filter-name>
+  	<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+  	<init-param>
+  		<param-name>encoding</param-name>
+  		<param-value>UTF-8</param-value>
+  	</init-param>
+  	
+  	<init-param>
+  		<param-name>forceEncoding</param-name>
+  		<param-value>true</param-value>
+  	</init-param>
+  </filter>
+  
+  <filter-mapping>
+  	<filter-name>charEncodingFilter</filter-name>
+  	<url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  <!-- Spring security filters
+  <filter>
+  	<filter-name>springSecurityFilterChain</filter-name>
+  	<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+  </filter>
+  
+  <filter-mapping>
+  	<filter-name>springSecurityFilterChain</filter-name>
+  	<url-pattern>/*</url-pattern>
+  </filter-mapping> -->
 
 </web-app>

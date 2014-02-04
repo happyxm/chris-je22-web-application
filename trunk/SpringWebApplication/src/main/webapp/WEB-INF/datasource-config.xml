@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:tx="http://www.springframework.org/schema/tx"
+           xmlns:context="http://www.springframework.org/schema/context"
+           xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd         
+                               http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+                        
+    <!-- Connection Data to MySQL DB -->                    
+        
+        <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+                <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+                <property name="url" value="jdbc:mysql://localhost:3306/database" />
+                <property name="username" value="root" />
+                <property name="password" value="admin" />
+        </bean>                 
+        
+	<!-- The key config file for JPA is persistence.xml. This lives in the META-INF directory. It details what the persistence driver to use and what JNDI data source to connect to. Additional properties can also be specified, in this case we’ll include some Hibernate properties. -->
+   	<!-- set up a shared JPA EntityManagerFactory in a Spring application context -->
+    <!-- As with LocalEntityManagerFactoryBean, configuration settings are usually read in from a META-INF/persistence.xml config file, residing in the class path, according to the general JPA configuration contract.  -->
+        
+        <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+                <!-- Specify the JpaVendorAdapter implementation for the desired JPA provider, if any. -->
+                <property name="jpaVendorAdapter">
+                        <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+                                <property name="showSql" value="true" />
+                                <property name="generateDdl" value="true" />
+                                <property name="databasePlatform" value="org.hibernate.dialect.MySQLDialect" />
+                        </bean>
+                </property>
+                
+                <!-- Specify the JDBC DataSource that the JPA persistence provider is supposed to use for accessing the database. 
+                This is an alternative to keeping the JDBC configuration in persistence.xml, passing in a Spring-managed DataSource instead -->
+                
+                <property name="dataSource" ref="dataSource" />
+        </bean>
+        
+     <!-- Add Transaction support to make atomic transaction-->
+     <!-- The access to the database should be done with transaction support, especially if you are writing in. -->
+        
+        <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+                <property name="dataSource" ref="dataSource" />
+                <property name="entityManagerFactory" ref="entityManagerFactory" />
+        </bean>
+        
+     <!-- Use @Transaction annotations for managing transactions -->
+        
+        <tx:annotation-driven transaction-manager="transactionManager" />
+     
+     <!-- By adding a single bean definition the Spring container will act as a JPA container and inject an EnitityManager from your EntityManagerFactory. -->
+        <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
+
+</beans>
